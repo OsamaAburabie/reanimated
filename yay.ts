@@ -1,5 +1,17 @@
 import * as React from "react";
-import { StatusBar, Image, View, StyleSheet } from "react-native";
+import {
+  StatusBar,
+  Image,
+  Text,
+  View,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  Easing,
+  SafeAreaViewBase,
+  SafeAreaView,
+} from "react-native";
+const { width, height } = Dimensions.get("screen");
 import faker from "@faker-js/faker";
 import Animated, {
   useAnimatedScrollHandler,
@@ -58,7 +70,6 @@ const App = () => {
       <Animated.FlatList
         data={DATA}
         onScroll={scrollHandler}
-        scrollEventThrottle={16}
         keyExtractor={(item) => item.key}
         contentContainerStyle={{ padding: SPACING }}
         renderItem={({ item, index }) => {
