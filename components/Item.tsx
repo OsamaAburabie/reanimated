@@ -1,36 +1,19 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Animated } from "react-native";
 import React from "react";
-import Animated, {
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  interpolate,
-} from "react-native-reanimated";
 type Props = {
-  scrollY: Animated.SharedValue<number>;
   item: {
     name: string;
     jobTitle: string;
     email: string;
+    image: string;
   };
-  index: number;
+
+  scale: Animated.AnimatedInterpolation;
 };
-const Item = ({ scrollY, item, index }: Props) => {
-  const BG_IMG =
-    "https://images.pexels.com/photos/1231265/pexels-photo-1231265.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
-  const SPACING = 20;
-  const AVATAR_SIZE = 70;
-  const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
 
-  const animatedStyles = useAnimatedStyle(() => {
-    const inputRange = [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)];
-    const scale = interpolate(scrollY.value, inputRange, [1, 1, 1, 0.8]);
-
-    return {
-      transform: [{ scale }],
-    };
-  });
-
+const SPACING = 20;
+const AVATAR_SIZE = 70;
+const Item = ({ item, scale }: Props) => {
   return (
     <Animated.View
       style={[
@@ -42,8 +25,8 @@ const Item = ({ scrollY, item, index }: Props) => {
           borderRadius: 12,
           elevation: 100,
           flex: 1,
+          transform: [{ scale }],
         },
-        animatedStyles,
       ]}
     >
       <Image
@@ -65,6 +48,7 @@ const Item = ({ scrollY, item, index }: Props) => {
           style={{
             fontSize: 22,
             fontWeight: "700",
+            color: "#000",
           }}
         >
           {item.name}
@@ -73,6 +57,7 @@ const Item = ({ scrollY, item, index }: Props) => {
           style={{
             fontSize: 18,
             opacity: 0.7,
+            color: "#000",
             flexWrap: "wrap",
           }}
         >

@@ -1,12 +1,13 @@
 import * as React from "react";
-import { StatusBar, Image, View, StyleSheet } from "react-native";
+import {
+  StatusBar,
+  Image,
+  Animated,
+  View,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import faker from "@faker-js/faker";
-import Animated, {
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  interpolate,
-} from "react-native-reanimated";
 import Item from "./components/Item";
 
 faker.seed(10);
@@ -26,28 +27,36 @@ const BG_IMG =
 const SPACING = 20;
 const AVATAR_SIZE = 70;
 const ITEM_SIZE = AVATAR_SIZE + SPACING * 3;
-
 const App = () => {
-  const scrollY = useSharedValue(0);
+  const scrollY = React.useRef(new Animated.Value(0)).current;
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const animatedStyles = useAnimatedStyle(() => {
-    const inputRange = [-1, 0, ITEM_SIZE * 0, ITEM_SIZE * 0];
-    const translateY = interpolate(scrollY.value, inputRange, [1, 1, 1, 0]);
-
-    return {
-      transform: [{ translateY }],
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: {
+      name: string;
+      jobTitle: string;
+      email: string;
+      image: string;
     };
-  });
+    index: number;
+  }) => {
+    const inputRange = [-1, 0, ITEM_SIZE * index, ITEM_SIZE * (index + 2)];
+    const outputRange = [1, 1, 1, 0.9];
 
+    const scale = scrollY.interpolate({
+      inputRange,
+      outputRange,
+    });
+    return <Item item={item} scale={scale} />;
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <StatusBar hidden />
+      <StatusBar
+        backgroundColor="rgba(255, 255, 255, 0.1)"
+        translucent={true}
+      />
       <Image
         source={{
           uri: BG_IMG,
@@ -57,13 +66,13 @@ const App = () => {
       />
       <Animated.FlatList
         data={DATA}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
         keyExtractor={(item) => item.key}
         contentContainerStyle={{ padding: SPACING }}
-        renderItem={({ item, index }) => {
-          return <Item scrollY={scrollY} item={item} index={index} />;
-        }}
+        renderItem={renderItem}
       />
     </View>
   );
